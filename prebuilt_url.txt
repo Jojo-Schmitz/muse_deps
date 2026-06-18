@@ -1,1 +1,1 @@
-https://github.com/kryksyh/muse_deps_private/releases/download
+https://github.com/musescore/muse_deps/releases/download
