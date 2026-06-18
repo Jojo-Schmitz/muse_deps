@@ -31,9 +31,9 @@ require_tool(yasm)
 require_source_dep(lv2sdk)
 ```
 
-The manifest names deps and the preferred mode, never versions. Each version
-lives in `<name>/<name>.cmake` as `DEP_VERSION`; the app pins the whole set by
-pinning this submodule's commit.
+The manifest names deps and the preferred mode. Each version
+lives in `<name>/<name>.cmake` as `DEP_VERSION`. The app pins the whole set by
+pinning this submodule's commit. You can't mix and match different versions.
 
 Order matters: a dep must appear after everything it links (e.g. `opusfile`
 after `opus` and `ogg`). `DEP_DEPENDS` passes prefixes into a recipe build but

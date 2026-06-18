@@ -1,4 +1,4 @@
-set(DEP_BINARY_URL_ROOT "https://github.com/kryksyh/muse_deps_private/releases/download/mirror-appimage-tools-2026.06.13")
+set(DEP_BINARY_URL_ROOT "https://github.com/musescore/muse_deps/releases/download/mirror-appimage-tools-2026.06.13")
 set(DEP_BINARY_NAME linuxdeploy-plugin-qt)
 
 set(DEP_BINARY_FILE_linux-x86_64    "linuxdeploy-plugin-qt-x86_64.AppImage")

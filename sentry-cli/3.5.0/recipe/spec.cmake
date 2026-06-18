@@ -1,5 +1,5 @@
 # manually mirrored
-set(DEP_BINARY_URL_ROOT "https://github.com/kryksyh/muse_deps_private/releases/download/mirror-sentry-cli-3.5.0")
+set(DEP_BINARY_URL_ROOT "https://github.com/musescore/muse_deps/releases/download/mirror-sentry-cli-3.5.0")
 set(DEP_BINARY_NAME sentry-cli)
 
 set(DEP_BINARY_FILE_windows-x86_64   "sentry-cli-Windows-x86_64.exe")

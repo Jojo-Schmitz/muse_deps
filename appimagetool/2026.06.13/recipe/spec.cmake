@@ -1,4 +1,4 @@
-set(DEP_BINARY_URL_ROOT "https://github.com/kryksyh/muse_deps_private/releases/download/mirror-appimage-tools-2026.06.13")
+set(DEP_BINARY_URL_ROOT "https://github.com/musescore/muse_deps/releases/download/mirror-appimage-tools-2026.06.13")
 set(DEP_BINARY_NAME appimagetool)
 
 set(DEP_BINARY_FILE_linux-x86_64    "appimagetool-x86_64.AppImage")

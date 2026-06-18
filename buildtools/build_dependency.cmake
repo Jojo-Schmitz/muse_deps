@@ -14,7 +14,7 @@ if(NOT EXTDEPS_PREBUILT_URL AND EXISTS "${CMAKE_CURRENT_LIST_DIR}/../prebuilt_ur
     string(STRIP "${EXTDEPS_PREBUILT_URL}" EXTDEPS_PREBUILT_URL)
 endif()
 if(NOT EXTDEPS_PREBUILT_URL)
-    set(EXTDEPS_PREBUILT_URL "https://github.com/kryksyh/muse_deps_private/releases/download")
+    set(EXTDEPS_PREBUILT_URL "https://github.com/musescore/muse_deps/releases/download")
 endif()
 
 # Source download cache location. order same as above. (todo: find a better place on Windows)
