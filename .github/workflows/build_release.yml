@@ -25,7 +25,7 @@ jobs:
           - { os: linux,   arch: aarch64,   runner: ubuntu-22.04-arm }
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - if: matrix.os == 'windows'
         uses: ilammy/msvc-dev-cmd@v1
         with:
@@ -39,7 +39,7 @@ jobs:
       - name: Build platform deps
         shell: bash
         run: cmake -DOS=${{ matrix.os }} -DARCH=${{ matrix.arch }} -P buildtools/build_platform.cmake
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v5
         with:
           name: out-${{ matrix.os }}-${{ matrix.arch }}
           path: .build/platform/out/
@@ -51,10 +51,10 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           ref: ${{ github.ref_name }}
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v5
         with:
           pattern: out-*
           merge-multiple: true
