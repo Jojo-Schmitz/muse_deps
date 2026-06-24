@@ -17,6 +17,8 @@ if(NOT EXTDEPS_PREBUILT_URL)
     set(EXTDEPS_PREBUILT_URL "https://github.com/musescore/muse_deps/releases/download")
 endif()
 
+get_filename_component(_BD_REPO_ROOT "${CMAKE_CURRENT_LIST_DIR}" DIRECTORY)
+
 # Source download cache location. order same as above. (todo: find a better place on Windows)
 function(_bd_resolve_cache out)
     if(DEFINED ENV{EXTDEPS_CACHE})
@@ -63,8 +65,19 @@ function(_bd_mirror repo_root out)
     set(${out} "${_base}/${release_tag}" PARENT_SCOPE)
 endfunction()
 
-# Download from the first working URL
-function(_bd_fetch dest sha256)
+# Split a DEP_SOURCES entry "sub|kind|location|pin" into its four fields.
+macro(_bd_parse_source entry out_sub out_kind out_loc out_pin)
+    string(REPLACE "|" ";" _bd_sf "${entry}")
+    list(GET _bd_sf 0 ${out_sub})
+    list(GET _bd_sf 1 ${out_kind})
+    list(GET _bd_sf 2 ${out_loc})
+    list(GET _bd_sf 3 ${out_pin})
+endmacro()
+
+# Try each URL in turn (retrying, verifying sha256).
+# Sets out_ok TRUE on the first good download
+function(_bd_try_fetch dest sha256 out_ok)
+    set(${out_ok} FALSE PARENT_SCOPE)
     foreach(url ${ARGN})
         foreach(attempt 1 2 3)
             file(DOWNLOAD "${url}" "${dest}" STATUS _status INACTIVITY_TIMEOUT 30)
@@ -72,6 +85,7 @@ function(_bd_fetch dest sha256)
             if(_code EQUAL 0)
                 file(SHA256 "${dest}" _got_sha256)
                 if(_got_sha256 STREQUAL "${sha256}")
+                    set(${out_ok} TRUE PARENT_SCOPE)
                     return()
                 endif()
                 message(WARNING "[fetch] ${url}: sha256 ${_got_sha256} != ${sha256}")
@@ -81,7 +95,14 @@ function(_bd_fetch dest sha256)
             file(REMOVE "${dest}")
         endforeach()
     endforeach()
-    message(FATAL_ERROR "[fetch] all sources failed for ${dest}")
+endfunction()
+
+# Download from the first working URL or fail hard.
+function(_bd_fetch dest sha256)
+    _bd_try_fetch("${dest}" "${sha256}" _ok ${ARGN})
+    if(NOT _ok)
+        message(FATAL_ERROR "[fetch] all sources failed for ${dest}")
+    endif()
 endfunction()
 
 # Run a command with reporting
@@ -200,11 +221,16 @@ endfunction()
 
 # Create a signature of the recipe directory and its contents
 function(_bd_recipe_sig recipe_dir os arch out)
-    set(_BD_ENGINE_REV 2)
+    set(_BD_ENGINE_REV 3)
     set(_sig "${_BD_ENGINE_REV}|${os}|${arch}")
     file(GLOB_RECURSE _files "${recipe_dir}/*")
     list(SORT _files)
     foreach(_file ${_files})
+        # meta.cmake describes how the dep is consumed, not how it is built,
+        # so it is excluded from the build signature.
+        if(_file STREQUAL "${recipe_dir}/meta.cmake")
+            continue()
+        endif()
         file(SHA256 "${_file}" _hash)
         string(APPEND _sig "|${_hash}")
     endforeach()
@@ -219,7 +245,7 @@ function(build_dep)
         set(BD_CONFIG "RelWithDebInfo")
     endif()
 
-    # Clear existing DEP_* variiables so recipes do not leak into each other
+    # Clear existing DEP_* variables so recipes do not leak into each other
     get_cmake_property(_allvars VARIABLES)
     foreach(_v ${_allvars})
         if(_v MATCHES "^DEP_")
@@ -276,9 +302,8 @@ function(build_dep)
     else()
         file(MAKE_DIRECTORY "${_download_dir}")
         message(STATUS "[${BD_NAME}] fetch ${DEP_SOURCE_URL}")
-        get_filename_component(_repo_root "${BD_RECIPE_DIR}/../../.." ABSOLUTE)
-        get_filename_component(_version_dir "${BD_RECIPE_DIR}" DIRECTORY)
-        get_filename_component(_version "${_version_dir}" NAME)
+        set(_repo_root "${_BD_REPO_ROOT}")
+        set(_version "${DEP_VERSION}")
 
         # First try our own presaved mirror,
         # if the depencency is new, then fetch from upstream

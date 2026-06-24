@@ -1,0 +1,11 @@
+set(DEP_KIND source)
+
+function(rapidjson_add_to_build)
+    if(TARGET rapidjson)
+        return()
+    endif()
+    get_property(_src GLOBAL PROPERTY rapidjson_SOURCE_DIR)
+    add_library(rapidjson INTERFACE)
+    add_library(rapidjson::rapidjson ALIAS rapidjson)
+    target_include_directories(rapidjson INTERFACE "${_src}/rapidjson/include")
+endfunction()
